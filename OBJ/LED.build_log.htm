@@ -4,7 +4,7 @@
 <h1>礦ision Build Log</h1>
 <h2>Project:</h2>
 F:\uavcan_stm32\freertos\FreeRTOS实验2-1 FreeRTOS移植实验\USER\FreeRTOS.uvprojx
-Project File Date:  12/08/2016
+Project File Date:  01/13/2017
 
 <h2>Output:</h2>
 Rebuild target 'FreeRTOS'
@@ -39,7 +39,29 @@ compiling tasks.c...
 compiling timers.c...
 compiling port.c...
 compiling heap_4.c...
+compiling pid.c...
+..\PID\pid.h(4): warning:  #1295-D: Deprecated declaration PID_init - give arg types
+  void PID_init();
+..\PID\pid.c: 1 warning, 0 errors
+compiling LowFilter.c...
 linking...
-Program Size: Code=43732 RO-data=3956 RW-data=304 ZI-data=23240  
+Program Size: Code=47464 RO-data=4136 RW-data=308 ZI-data=23236  
 FromELF: creating hex file...
-"..\OBJ\LED.axf" - 0 Error(s), 0 Warning(s).
+"..\OBJ\LED.axf" - 0 Error(s), 1 Warning(s).
+
+  #define fpclassify(x) (sizeof (x) == sizeof (float) ? __fpclassifyf (x) : sizeof (x) == sizeof (double) ? __fpclassify (x) : __fpclassifyl (x))
+..\MATH\LowFilter.h(6): warning:  #47-D: incompatible redefinition of macro "isfinite" (declared at line 495 of "C:\MDK\ARM\ARMCC\bin\..\include\math.h")
+  #define isfinite(x) ((fpclassify(x) & FP_NAN) == 0)
+..\MATH\LowFilter.c(43): warning:  #223-D: function "__fpclassifyf" declared implicitly
+      if (!PX4_ISFINITE(delay_element_0)) {
+..\MATH\LowFilter.c(43): warning:  #223-D: function "__fpclassify" declared implicitly
+      if (!PX4_ISFINITE(delay_element_0)) {
+..\MATH\LowFilter.c(43): warning:  #223-D: function "__fpclassifyl" declared implicitly
+      if (!PX4_ISFINITE(delay_element_0)) {
+..\MATH\LowFilter.c: 5 warnings, 0 errors
+linking...
+..\OBJ\LED.axf: Error: L6218E: Undefined symbol __fpclassifyf (referred from lowfilter.o).
+Not enough information to list image symbols.
+Finished: 1 information, 0 warning and 1 error messages.
+"..\OBJ\LED.axf" - 1 Error(s), 6 Warning(s).
+Target not created

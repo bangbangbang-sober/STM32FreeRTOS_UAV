@@ -3,6 +3,7 @@
 #include "usart.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
 
 #include "start_task.h"
 #include "led.h"
@@ -18,7 +19,6 @@
 #include "checksum.h"
 #include "protocol.h"
 #include "common.h"
-//#inlcude "mavlink_msg_heartbeat.h"
 
 
 short aacx = 0,aacy = 0,aacz = 0;								//加速度传感器原始数据
@@ -27,6 +27,9 @@ short temp = 0;																	//温度
 static uint16_t iddata = 0xc0;
 float roll,pitch,yaw;														//姿态角
 float m_roll,m_pitch,m_yaw;
+
+//句柄
+xQueueHandle MsgQueue;
 
 int main(void)
 { 
@@ -38,7 +41,10 @@ int main(void)
 	LCD_Init();							//LCD初始化
 	MPU_Init();							//MPU6050初始化
 	mpu_dmp_init();					//dmp库初始化
-	CAN1_Mode_Init(CAN_SJW_1tq,CAN_BS2_6tq,CAN_BS1_7tq,6,CAN_Mode_Normal);//CAN初始化,波特率500Kbps 
+	CAN1_Mode_Init(CAN_SJW_1tq,CAN_BS2_6tq,CAN_BS1_7tq,6,CAN_Mode_Normal);//CAN初始化,波特率500Kbps
+	
+	//创建队列
+	MsgQueue = xQueueCreate(10, sizeof(float));
 	
 	//创建开始任务
     xTaskCreate((TaskFunction_t )start_task,            //任务函数
@@ -106,7 +112,11 @@ void mpu_task(void *pvParameters)
 		temp=MPU_Get_Temperature();								//得到温度值
 		MPU_Get_Accelerometer(&aacx,&aacy,&aacz);	//得到加速度传感器数据
 		MPU_Get_Gyroscope(&gyrox,&gyroy,&gyroz);	//得到陀螺仪数据
+		
 		IMUupdate(aacx,aacy,aacz,gyrox,gyroy,gyroz,&roll,&pitch,&yaw);	//得到姿态角
+		
+		//往队列写参数
+		xQueueSend(MsgQueue, (void *) &aacx, (portTickType) 10);
 		
 	//printf("roll = %.4f,pitch = %.4f,yaw = %.4f\r\n",roll,pitch,yaw);
 		vTaskDelay(1000);
@@ -116,6 +126,7 @@ void mpu_task(void *pvParameters)
 //CAN任务
 void can_task(void *pvParameters)
 {
+	float test_aacx;
 	//message ID
 	uint32_t gyro_id = 0x000007D0;			//0x00000080;
 	uint32_t accel_id = 0x000007D1;			//0x00000080;
@@ -126,6 +137,10 @@ void can_task(void *pvParameters)
 		iddata++;																								//transfer ID
 		if(iddata > 0xdf)
 			iddata = 0xc0;
+		
+		
+		xQueueReceive(MsgQueue, &test_aacx, portMAX_DELAY);
+		printf("test = %.4f\r\n",test_aacx);
 	}
 }
 

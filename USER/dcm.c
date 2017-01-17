@@ -6,7 +6,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#define RtA 		57.324841f				
+#define RtA 			57.324841f				
 #define AtR    		0.0174533f				
 #define Acc_G 		0.0011963f				
 #define Gyro_G 		0.0610351f				
@@ -18,9 +18,9 @@
 #define halfT 0.001f                   // half the sample period???????
 
 
-float 	AngleOffset_Rol=0,AngleOffset_Pit=0;
+float AngleOffset_Rol=0,AngleOffset_Pit=0;
 
-float q0 = 1, q1 = 0, q2 = 0, q3 = 0;    // quaternion elements representing the estimated orientation
+float q0 = 1, q1 = 0, q2 = 0, q3 = 0;    	// quaternion elements representing the estimated orientation
 float exInt = 0, eyInt = 0, ezInt = 0;    // scaled integral error
 
 void IMUupdate(short axx,short ayy,short azz,short gxx,short gyy,short gzz,float *roll,float *pitch,float *yaw)
@@ -32,7 +32,6 @@ void IMUupdate(short axx,short ayy,short azz,short gxx,short gyy,short gzz,float
   float vx, vy, vz;// wx, wy, wz;
   float ex, ey, ez;
 
-  
   float q0q0 = q0*q0;
   float q0q1 = q0*q1;
   float q0q2 = q0*q2;
@@ -52,7 +51,7 @@ void IMUupdate(short axx,short ayy,short azz,short gxx,short gyy,short gzz,float
 	gz *= Gyro_Gr;
 		
   norm = sqrt(ax*ax + ay*ay + az*az);      
-  ax = ax /norm;
+  ax = ax /	norm;
   ay = ay / norm;
   az = az / norm;
 
@@ -91,7 +90,7 @@ void IMUupdate(short axx,short ayy,short azz,short gxx,short gyy,short gzz,float
 
 	(*yaw) += gzz*Gyro_G*0.002f;
 	
-	(*roll) = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3 - AngleOffset_Pit; // pitch
+	(*roll) = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3 - AngleOffset_Pit; 																	// pitch
 	(*pitch) = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* 57.3 - AngleOffset_Rol; // roll
 }
 
